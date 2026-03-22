@@ -26,10 +26,12 @@ export default function Layout({ children }) {
     { id: 'verification', icon: '✅', label: 'Verify'        },
   ]
   const adminNav = [
-    { id: 'admin-dashboard',    icon: '🏠', label: 'Overview' },
-    { id: 'scorecard',          icon: '🏏', label: 'Scorecard' },
-    { id: 'draft',              icon: '🎯', label: 'Draft'     },
-    { id: 'admin-participants', icon: '👤', label: 'Players'   },
+    { id: 'admin-dashboard',    icon: '🏠', label: 'Overview'       },
+    { id: 'scorecard',          icon: '🏏', label: 'Scorecard Entry' },
+    { id: 'draft',              icon: '🎯', label: 'Draft Picker'    },
+    { id: 'allslots',           icon: '📋', label: 'All Slots'       },
+    { id: 'admin-participants', icon: '👤', label: 'Participants'    },
+    { id: 'sheets-sync',        icon: '📊', label: 'Sheets Sync'    },
   ]
   const navItems = isAdmin ? adminNav : participantNav
 
@@ -63,33 +65,35 @@ export default function Layout({ children }) {
           {children}
         </div>
 
-        {/* Bottom tab bar */}
-        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#09111F', borderTop: '1px solid #0F1E35', display: 'flex', zIndex: 100, paddingBottom: 'env(safe-area-inset-bottom)' }}>
-          {navItems.map(item => {
-            const active = page === item.id
-            return (
-              <button key={item.id} onClick={() => navigate(item.id)} style={{
-                flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                padding: '10px 4px 8px', border: 'none', background: 'transparent',
-                color: active ? '#22C55E' : '#475569', cursor: 'pointer',
-                borderTop: active ? '2px solid #22C55E' : '2px solid transparent',
-                transition: 'all 0.15s', fontFamily: 'inherit',
-              }}>
-                <span style={{ fontSize: 18, marginBottom: 3 }}>{item.icon}</span>
-                <span style={{ fontSize: 10, fontWeight: active ? 700 : 500 }}>{item.label}</span>
-              </button>
-            )
-          })}
-          {/* Logout tab */}
-          <button onClick={logout} style={{
-            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            padding: '10px 4px 8px', border: 'none', background: 'transparent',
-            color: '#EF4444', cursor: 'pointer', borderTop: '2px solid transparent',
-            fontFamily: 'inherit',
-          }}>
-            <span style={{ fontSize: 18, marginBottom: 3 }}>↩</span>
-            <span style={{ fontSize: 10, fontWeight: 500 }}>Out</span>
-          </button>
+        {/* Bottom tab bar — scrollable so all admin items are reachable */}
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#09111F', borderTop: '1px solid #0F1E35', zIndex: 100, paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          <div style={{ display: 'flex', overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+            {navItems.map(item => {
+              const active = page === item.id
+              return (
+                <button key={item.id} onClick={() => navigate(item.id)} style={{
+                  flex: '0 0 auto', minWidth: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  padding: '10px 8px 8px', border: 'none', background: 'transparent',
+                  color: active ? '#22C55E' : '#475569', cursor: 'pointer',
+                  borderTop: active ? '2px solid #22C55E' : '2px solid transparent',
+                  transition: 'all 0.15s', fontFamily: 'inherit',
+                }}>
+                  <span style={{ fontSize: 18, marginBottom: 3 }}>{item.icon}</span>
+                  <span style={{ fontSize: 10, fontWeight: active ? 700 : 500, whiteSpace: 'nowrap' }}>{item.label}</span>
+                </button>
+              )
+            })}
+            {/* Logout tab */}
+            <button onClick={logout} style={{
+              flex: '0 0 auto', minWidth: 56, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              padding: '10px 8px 8px', border: 'none', background: 'transparent',
+              color: '#EF4444', cursor: 'pointer', borderTop: '2px solid transparent',
+              fontFamily: 'inherit',
+            }}>
+              <span style={{ fontSize: 18, marginBottom: 3 }}>↩</span>
+              <span style={{ fontSize: 10, fontWeight: 500 }}>Out</span>
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -110,7 +114,7 @@ export default function Layout({ children }) {
         <div style={{ margin: '6px 10px 8px', padding: '5px 10px', background: isAdmin ? 'rgba(239,68,68,0.08)' : 'rgba(34,197,94,0.06)', borderRadius: 6, fontSize: 10, fontWeight: 700, color: isAdmin ? '#EF4444' : '#22C55E', letterSpacing: '0.5px' }}>
           {isAdmin ? '🛡 ADMIN' : '👤 PARTICIPANT'}
         </div>
-        <nav style={{ flex: 1, padding: '4px 6px', display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <nav style={{ flex: 1, padding: '4px 6px', display: 'flex', flexDirection: 'column', gap: 1, overflowY: 'auto' }}>
           {navItems.map(item => {
             const active = page === item.id
             return (

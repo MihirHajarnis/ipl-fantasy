@@ -25,14 +25,15 @@ export async function fetchParticipants() {
 
 // ── Update participant name / access code ─────────────────────
 export async function updateParticipant(id, name, accessCode) {
+  // Use update without .single() to avoid coercion errors
   const { data, error } = await supabase
     .from('participants')
     .update({ name: name.trim(), access_code: accessCode.toUpperCase().trim() })
     .eq('id', id)
     .select()
-    .single()
   if (error) throw error
-  return data
+  // data is an array — return first row
+  return data?.[0] || null
 }
 
 export async function fetchParticipantByCode(code) {
