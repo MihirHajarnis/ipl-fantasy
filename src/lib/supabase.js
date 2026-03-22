@@ -37,5 +37,5 @@ export const PARTICIPANT_COLORS = [
 ]
 
 // Admin credentials — checked client-side (gate) + Supabase service key does real auth
-export const ADMIN_USERNAME = 'commissioner'
-export const ADMIN_PASSWORD = 'ipl2025admin'   // change before deploy!
+export const ADMIN_USERNAME = 'humadminhai'
+export const ADMIN_PASSWORD = 'tujhepasswordnahibataunga@#'   // change before deploy!
