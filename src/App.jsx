@@ -10,6 +10,9 @@ import AllSlots    from './pages/AllSlots.jsx'
 import SlotDetail  from './pages/SlotDetail.jsx'
 import Verification from './pages/Verification.jsx'
 import DraftPicker from './pages/DraftPicker.jsx'
+import AdminParticipants from './pages/AdminParticipants.jsx'
+import ScorecardEntry from './pages/ScorecardEntry.jsx'
+import SheetsSync from './pages/SheetsSync.jsx'
 
 function Router() {
   const { user, page, confetti, setConfetti } = useApp()
@@ -49,6 +52,9 @@ function Router() {
         {page === 'admin-scores'   && <AdminScores />}
         {page === 'admin-matches'  && <AdminScores />}
         {page === 'draft'          && <DraftPicker />}
+        {page === 'admin-participants' && <AdminParticipants />}
+        {page === 'scorecard'           && <ScorecardEntry />}
+        {page === 'sheets-sync'         && <SheetsSync />}
       </Layout>
     </>
   )
@@ -73,6 +79,7 @@ export default function App() {
         @keyframes toastIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes liveP   { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.35; transform:scale(0.75); } }
         @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+        @keyframes spin    { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
     </>
   )

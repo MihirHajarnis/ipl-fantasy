@@ -26,10 +26,10 @@ export default function Layout({ children }) {
     { id: 'verification', icon: '✅', label: 'Verify'        },
   ]
   const adminNav = [
-    { id: 'admin-dashboard', icon: '🏠', label: 'Overview'   },
-    { id: 'admin-scores',    icon: '✏️', label: 'Scores'     },
-    { id: 'draft',           icon: '🎯', label: 'Draft'       },
-    { id: 'allslots',        icon: '📋', label: 'All Slots'   },
+    { id: 'admin-dashboard',    icon: '🏠', label: 'Overview' },
+    { id: 'scorecard',          icon: '🏏', label: 'Scorecard' },
+    { id: 'draft',              icon: '🎯', label: 'Draft'     },
+    { id: 'admin-participants', icon: '👤', label: 'Players'   },
   ]
   const navItems = isAdmin ? adminNav : participantNav
 

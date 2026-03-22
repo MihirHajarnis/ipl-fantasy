@@ -55,9 +55,7 @@ export default function LoginPage() {
               </div>
             </>
           ) : (
-            <Field label="Access Code" value={code} onChange={setCode} placeholder="e.g. ASH001" onEnter={go}
-              hint="ASH001 · KUN002 · TAN003 · MIH004 · PRA005 · SAN006 · TUS007 · PTH008 · PAD009 · VIS010 · ARV011 · MIT012"
-            />
+            <Field label="Access Code" value={code} onChange={setCode} placeholder="Enter your access code" onEnter={go} />
           )}
 
           <button onClick={go} disabled={loading} style={{

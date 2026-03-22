@@ -22,6 +22,19 @@ export async function fetchParticipants() {
   return data
 }
 
+
+// ── Update participant name / access code ─────────────────────
+export async function updateParticipant(id, name, accessCode) {
+  const { data, error } = await supabase
+    .from('participants')
+    .update({ name: name.trim(), access_code: accessCode.toUpperCase().trim() })
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
 export async function fetchParticipantByCode(code) {
   const { data, error } = await supabase
     .from('participants')
