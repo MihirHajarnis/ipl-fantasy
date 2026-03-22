@@ -149,6 +149,37 @@ export async function publishMatch(matchId) {
   if (error) throw error
 }
 
+// ── Delete a single slot's score for a match ──────────────────
+// Removes the row entirely — slot shows as 0 runs on leaderboard
+export async function deleteScore(matchId, slotId) {
+  const { error } = await supabase
+    .from('match_scores')
+    .delete()
+    .eq('match_id', matchId)
+    .eq('slot_id', slotId)
+  if (error) throw error
+}
+
+// ── Unpublish a match (revert to draft) ───────────────────────
+// Scores are kept in DB, just hidden from leaderboard until re-published
+export async function unpublishMatch(matchId) {
+  const { error } = await supabase
+    .from('matches')
+    .update({ published: false, published_at: null })
+    .eq('id', matchId)
+  if (error) throw error
+}
+
+// ── Delete an entire match and all its scores ─────────────────
+export async function deleteMatch(matchId) {
+  // match_scores will cascade delete via FK constraint
+  const { error } = await supabase
+    .from('matches')
+    .delete()
+    .eq('id', matchId)
+  if (error) throw error
+}
+
 // ── SLOT SEASON TOTALS ────────────────────────────────────────
 
 export async function fetchSlotTotals() {
