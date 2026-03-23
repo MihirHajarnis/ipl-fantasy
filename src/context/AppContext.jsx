@@ -4,6 +4,7 @@ import {
   fetchLeaderboard, fetchParticipants, fetchParticipantByCode,
   fetchDraftAssignments, fetchDraftState,
   fetchMatches, fetchSlotTotals,
+  fetchSwapRounds,
 } from '../lib/api.js'
 
 const AppCtx = createContext(null)
@@ -25,6 +26,7 @@ export function AppProvider({ children }) {
   const [loading,      setLoading]      = useState(true)
   const [toasts,       setToasts]       = useState([])
   const [confetti,     setConfetti]     = useState(false)
+  const [swapRounds,   setSwapRounds]   = useState([])
 
   // ── Toast ──────────────────────────────────────────────────
 
@@ -38,13 +40,14 @@ export function AppProvider({ children }) {
 
   const loadAll = useCallback(async () => {
     try {
-      const [lb, parts, slots, matchList, dState, dAssign] = await Promise.all([
+      const [lb, parts, slots, matchList, dState, dAssign, swapRds] = await Promise.all([
         fetchLeaderboard(),
         fetchParticipants(),
         fetchSlotTotals(),
         fetchMatches(),
         fetchDraftState(),
         fetchDraftAssignments(),
+        fetchSwapRounds(),
       ])
 
       setLeaderboard(lb || [])
@@ -62,6 +65,7 @@ export function AppProvider({ children }) {
       const dm = {}
       ;(dAssign || []).forEach(a => { dm[a.slot_id] = a.participant_id })
       setDraftMap(dm)
+      setSwapRounds(swapRds || [])
     } catch (err) {
       console.error('loadAll error:', err)
       toast('Failed to load data — check Supabase config', 'error')
@@ -91,6 +95,14 @@ export function AppProvider({ children }) {
       )
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'draft_assignments' },
+        () => { loadAll() }
+      )
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'swap_requests' },
+        () => { loadAll() }
+      )
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'power_swap_rounds' },
         () => { loadAll() }
       )
       .subscribe()
@@ -158,7 +170,7 @@ export function AppProvider({ children }) {
       leaderboard, participants, slotTotals, matches, draftState, draftMap,
       latestMatch, getSlotOwner, getParticipantSlots,
       loading, toast, toasts, confetti, setConfetti,
-      refresh: loadAll,
+      swapRounds, refresh: loadAll,
     }}>
       {children}
     </AppCtx.Provider>

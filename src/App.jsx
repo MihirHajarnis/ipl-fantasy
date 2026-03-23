@@ -13,6 +13,7 @@ import DraftPicker from './pages/DraftPicker.jsx'
 import AdminParticipants from './pages/AdminParticipants.jsx'
 import ScorecardEntry from './pages/ScorecardEntry.jsx'
 import SheetsSync from './pages/SheetsSync.jsx'
+import PowerSwap from './pages/PowerSwap.jsx'
 
 function Router() {
   const { user, page, confetti, setConfetti } = useApp()
@@ -55,6 +56,7 @@ function Router() {
         {page === 'admin-participants' && <AdminParticipants />}
         {page === 'scorecard'           && <ScorecardEntry />}
         {page === 'sheets-sync'         && <SheetsSync />}
+        {page === 'power-swap'           && <PowerSwap />}
       </Layout>
     </>
   )

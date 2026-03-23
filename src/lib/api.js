@@ -249,3 +249,120 @@ export async function upsertVerification(matchId, slotId, participantId, status)
     }, { onConflict: 'match_id,slot_id,participant_id' })
   if (error) throw error
 }
+
+// ── POWER SWAP ────────────────────────────────────────────────
+
+export async function fetchSwapRounds() {
+  const { data, error } = await supabase
+    .from('power_swap_rounds')
+    .select('*')
+    .order('round_number')
+  if (error) throw error
+  return data || []
+}
+
+export async function openSwapRound(roundId) {
+  const { error } = await supabase
+    .from('power_swap_rounds')
+    .update({ status: 'open', opened_at: new Date().toISOString() })
+    .eq('id', roundId)
+  if (error) throw error
+}
+
+export async function closeSwapRound(roundId) {
+  // Cancel all pending/accepted swaps that weren't finalised
+  await supabase
+    .from('swap_requests')
+    .update({ status: 'cancelled' })
+    .eq('round_id', roundId)
+    .in('status', ['pending', 'accepted'])
+  const { error } = await supabase
+    .from('power_swap_rounds')
+    .update({ status: 'closed' })
+    .eq('id', roundId)
+  if (error) throw error
+}
+
+export async function finaliseSwapRound(roundId) {
+  // 1. Fetch all accepted swaps
+  const { data: swaps, error: fetchErr } = await supabase
+    .from('swap_requests')
+    .select('*')
+    .eq('round_id', roundId)
+    .eq('status', 'accepted')
+  if (fetchErr) throw fetchErr
+
+  // 2. Execute each swap — reassign draft_assignments
+  for (const swap of swaps) {
+    // Proposer gets receiver's slot
+    await supabase
+      .from('draft_assignments')
+      .update({ participant_id: swap.proposer_id })
+      .eq('slot_id', swap.receiver_slot)
+
+    // Receiver gets proposer's slot
+    await supabase
+      .from('draft_assignments')
+      .update({ participant_id: swap.receiver_id })
+      .eq('slot_id', swap.proposer_slot)
+
+    // Mark swap as finalised
+    await supabase
+      .from('swap_requests')
+      .update({ status: 'finalised', finalised_at: new Date().toISOString() })
+      .eq('id', swap.id)
+  }
+
+  // 3. Mark round as finalised
+  const { error } = await supabase
+    .from('power_swap_rounds')
+    .update({ status: 'finalised', finalised_at: new Date().toISOString() })
+    .eq('id', roundId)
+  if (error) throw error
+}
+
+export async function fetchSwapRequests(roundId) {
+  const { data, error } = await supabase
+    .from('swap_requests')
+    .select('*')
+    .eq('round_id', roundId)
+    .order('proposed_at', { ascending: false })
+  if (error) throw error
+  return data || []
+}
+
+export async function proposeSwap(roundId, proposerId, proposerSlot, receiverId, receiverSlot) {
+  const { data, error } = await supabase
+    .from('swap_requests')
+    .insert({
+      round_id:      roundId,
+      proposer_id:   proposerId,
+      proposer_slot: proposerSlot,
+      receiver_id:   receiverId,
+      receiver_slot: receiverSlot,
+      status:        'pending',
+    })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function respondToSwap(swapId, accept) {
+  const { error } = await supabase
+    .from('swap_requests')
+    .update({
+      status:       accept ? 'accepted' : 'declined',
+      responded_at: new Date().toISOString(),
+    })
+    .eq('id', swapId)
+  if (error) throw error
+}
+
+export async function cancelSwap(swapId) {
+  const { error } = await supabase
+    .from('swap_requests')
+    .update({ status: 'cancelled' })
+    .eq('id', swapId)
+  if (error) throw error
+}
