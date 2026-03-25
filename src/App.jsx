@@ -14,6 +14,8 @@ import AdminParticipants from './pages/AdminParticipants.jsx'
 import ScorecardEntry from './pages/ScorecardEntry.jsx'
 import SheetsSync from './pages/SheetsSync.jsx'
 import PowerSwap from './pages/PowerSwap.jsx'
+import MatchCenter from './pages/MatchCenter.jsx'
+import AuditLog from './pages/AuditLog.jsx'
 
 function Router() {
   const { user, page, confetti, setConfetti } = useApp()
@@ -57,6 +59,8 @@ function Router() {
         {page === 'scorecard'           && <ScorecardEntry />}
         {page === 'sheets-sync'         && <SheetsSync />}
         {page === 'power-swap'           && <PowerSwap />}
+        {page === 'match-center'         && <MatchCenter />}
+        {page === 'audit-log'            && <AuditLog />}
       </Layout>
     </>
   )

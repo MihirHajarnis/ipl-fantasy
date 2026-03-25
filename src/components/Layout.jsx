@@ -25,6 +25,7 @@ export default function Layout({ children }) {
     { id: 'allslots',     icon: '📋', label: 'All Slots'     },
     { id: 'verification', icon: '✅', label: 'Verify'        },
     { id: 'power-swap',   icon: '⚡', label: 'Power Swap'    },
+    { id: 'match-center',  icon: '🏟', label: 'Match Centre'  },
   ]
   const adminNav = [
     { id: 'admin-dashboard',    icon: '🏠', label: 'Overview'       },
@@ -33,7 +34,9 @@ export default function Layout({ children }) {
     { id: 'allslots',           icon: '📋', label: 'All Slots'       },
     { id: 'admin-participants', icon: '👤', label: 'Participants'    },
     { id: 'power-swap',         icon: '⚡', label: 'Power Swap'    },
-    { id: 'sheets-sync',        icon: '📊', label: 'Sheets Sync'    },
+    { id: 'match-center',       icon: '🏟', label: 'Match Centre'  },
+    { id: 'audit-log',          icon: '🔍', label: 'Audit Log'     },
+    { id: 'sheets-sync',        icon: '📊', label: 'Sheets Sync'   },
   ]
   const navItems = isAdmin ? adminNav : participantNav
 

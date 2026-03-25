@@ -366,3 +366,97 @@ export async function cancelSwap(swapId) {
     .eq('id', swapId)
   if (error) throw error
 }
+
+// ── AUDIT LOG ─────────────────────────────────────────────────
+
+export async function writeAuditLog(matchId, slotId, action, oldVals, newVals) {
+  const { error } = await supabase.from('score_audit_log').insert({
+    match_id:   matchId,
+    slot_id:    slotId,
+    action,
+    old_runs:   oldVals?.runs  ?? null,
+    old_balls:  oldVals?.balls ?? null,
+    old_fours:  oldVals?.fours ?? null,
+    old_sixes:  oldVals?.sixes ?? null,
+    new_runs:   newVals?.runs  ?? null,
+    new_balls:  newVals?.balls ?? null,
+    new_fours:  newVals?.fours ?? null,
+    new_sixes:  newVals?.sixes ?? null,
+    entered_by: 'Admin',
+    entered_at: new Date().toISOString(),
+  })
+  if (error) console.warn('Audit log write failed:', error.message)
+}
+
+export async function fetchAuditLog(matchId) {
+  const { data, error } = await supabase
+    .from('score_audit_log')
+    .select('*')
+    .eq('match_id', matchId)
+    .order('entered_at', { ascending: false })
+  if (error) throw error
+  return data || []
+}
+
+export async function fetchAllAuditLogs() {
+  const { data, error } = await supabase
+    .from('score_audit_log')
+    .select('*, matches(label)')
+    .order('entered_at', { ascending: false })
+    .limit(200)
+  if (error) throw error
+  return data || []
+}
+
+// ── RANK SNAPSHOT (store before publish so we can show change) ─
+
+export async function saveRankSnapshot(matchId, leaderboard) {
+  const snapshot = {}
+  leaderboard.forEach(p => { snapshot[p.id] = p.rank })
+  const { error } = await supabase
+    .from('matches')
+    .update({ rank_snapshot: snapshot })
+    .eq('id', matchId)
+  if (error) console.warn('Rank snapshot failed:', error.message)
+}
+
+export async function fetchRankSnapshot(matchId) {
+  const { data, error } = await supabase
+    .from('matches')
+    .select('rank_snapshot')
+    .eq('id', matchId)
+    .single()
+  if (error) return {}
+  return data?.rank_snapshot || {}
+}
+
+// ── PER-MATCH SCORES FOR ALL SLOTS (for awards/streaks) ───────
+
+export async function fetchAllMatchScores() {
+  const { data, error } = await supabase
+    .from('match_scores')
+    .select('*, matches(label, published, match_date)')
+    .order('match_id', { ascending: true })
+  if (error) throw error
+  return (data || []).filter(r => r.matches?.published)
+}
+
+// ── EXPORT ALL DATA ───────────────────────────────────────────
+
+export async function fetchExportData() {
+  const [matches, scores, participants, assignments, leaderboard] = await Promise.all([
+    supabase.from('matches').select('*').order('id'),
+    supabase.from('match_scores').select('*').order('match_id'),
+    supabase.from('participants').select('*').order('id'),
+    supabase.from('draft_assignments').select('*'),
+    supabase.from('leaderboard').select('*').order('rank'),
+  ])
+  return {
+    matches:      matches.data      || [],
+    scores:       scores.data       || [],
+    participants: participants.data || [],
+    assignments:  assignments.data  || [],
+    leaderboard:  leaderboard.data  || [],
+    exported_at:  new Date().toISOString(),
+  }
+}
